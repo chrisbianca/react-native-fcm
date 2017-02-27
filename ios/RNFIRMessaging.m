@@ -247,7 +247,7 @@ RCT_EXPORT_METHOD(getFCMToken:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromi
   [_bridge.eventDispatcher sendDeviceEventWithName:@"FCMTokenRefreshed" body:[[FIRInstanceID instanceID] token]];
 }
 
-RCT_EXPORT_METHOD(requestPermissions)
+RCT_EXPORT_METHOD(requestPermissions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   if (RCTRunningInAppExtension()) {
     return;
@@ -265,6 +265,7 @@ RCT_EXPORT_METHOD(requestPermissions)
       //iOS 7 or below
       [app registerForRemoteNotificationTypes:(NSUInteger)allNotificationTypes];
     }
+    resolve(@{@"status":@"unknown"});
   } else {
     // iOS 10 or later
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
@@ -275,6 +276,7 @@ RCT_EXPORT_METHOD(requestPermissions)
     [[UNUserNotificationCenter currentNotificationCenter]
      requestAuthorizationWithOptions:authOptions
      completionHandler:^(BOOL granted, NSError * _Nullable error) {
+       resolve(@{@"granted":@(granted)});
      }
      ];
 #endif
